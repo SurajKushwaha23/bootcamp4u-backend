@@ -1,2 +1,18 @@
+# Default behavior: Let Git handle line endings automatically
+* text=auto
+
+# Explicitly declare text files you want to always be normalized
+*.java text
+*.properties text
+*.xml text
+*.yml text
+*.yaml text
+*.md text
+
+# Maven Wrapper rules (Your specific requests)
+# Ensure the Unix shell script always uses LF
 /mvnw text eol=lf
+
+# Ensure Windows batch scripts always use CRLF
 *.cmd text eol=crlf
+*.bat text eol=crlf
