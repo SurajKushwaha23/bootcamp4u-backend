@@ -1,29 +1,33 @@
 package com.bootcamp4u.serviceImpl;
 
+import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.response.RegisterResponse;
 import com.bootcamp4u.entity.User;
 import com.bootcamp4u.exception.DuplicateResourceException;
+import com.bootcamp4u.mapper.UserMapper;
 import com.bootcamp4u.repository.UserRepository;
 import com.bootcamp4u.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private  final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     /**
      * Registers a new user.
@@ -31,32 +35,25 @@ public class UserServiceImpl implements UserService {
      * * @param user The user object (validated via @Valid in the controller)
      * @return The saved User entity
      */
-    public User registerUser(User user) {
-        logger.info("Processing registration for username: {}", user.getUsername());
+    public RegisterResponse registerUser(RegisterRequest request) {
+        logger.info("Processing registration for username: {}", request.getUsername());
 
-        // Check uniqueness (Logic that requires DB access stays in the service)
-        if (userRepository.existsByUsername(user.getUsername())) {
-            logger.error("Registration failed: Username {} already exists", user.getUsername());
-            throw new DuplicateResourceException("Username is already in use");
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new DuplicateResourceException("Username is already taken.");
         }
 
-        if (userRepository.existsByEmail(user.getEmail())) {
-            logger.error("Registration failed: Email {} already exists", user.getEmail());
-            throw new DuplicateResourceException("Email is already in use");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("Email is already registered.");
         }
 
-        // Secure the password
+        User user = userMapper.toEntity(request);
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Logic for default state
-        if (user.getIsActive() == null) {
-            user.setIsActive(true);
-        }
 
         User savedUser = userRepository.save(user);
         logger.info("User {} registered successfully with ID: {}", savedUser.getUsername(), savedUser.getId());
 
-        return savedUser;
+        return userMapper.toResponse(savedUser);
     }
 
     @Override

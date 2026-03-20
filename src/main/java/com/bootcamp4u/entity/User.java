@@ -52,7 +52,7 @@ public class User implements UserDetails {
     private String phone;
 
     @NotNull(message = "Role is required")
-    @Column(name="roles", nullable = false)
+    @Column(name="role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 

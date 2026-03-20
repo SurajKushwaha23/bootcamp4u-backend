@@ -4,10 +4,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,15 +22,12 @@ import java.util.stream.Collectors;
 
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     /**
      * Helper method to extract the token from the Authorization header.
@@ -44,15 +45,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         try {
+            // 1. Extract the JWT from the HTTP request
             String jwtToken = getJwtTokenFromHeader(request);
 
-            if (jwtToken != null && jwtTokenProvider.validateToken(jwtToken)) {
+            // 2. Validate the token
+            if (StringUtils.hasText(jwtToken) && jwtTokenProvider.validateToken(jwtToken)) {
 
+                // 3. Extract data from the valid token
                 String username = jwtTokenProvider.getUsernameFromToken(jwtToken);
-                List<String> roles = jwtTokenProvider.getClaimFromToken(jwtToken, claims -> claims.get("roles", List.class));
+                List<String> roles = jwtTokenProvider.getRolesFromToken(jwtToken);
 
                 // 4. Convert string roles to Spring Security GrantedAuthorities
                 List<SimpleGrantedAuthority> authorities = roles.stream()
@@ -63,11 +68,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(username, null, authorities);
 
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                // 5. Save the Authentication to the SecurityContext
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
             }
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            logger.error("Could not set user authentication in security context", ex);
         }
+
+        // 6. Continue the request flow
+        filterChain.doFilter(request, response);
 
     }
 }

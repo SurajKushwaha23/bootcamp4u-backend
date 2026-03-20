@@ -1,5 +1,7 @@
 package com.bootcamp4u.service;
 
+import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.response.RegisterResponse;
 import com.bootcamp4u.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +18,11 @@ public interface UserService {
     /**
      * Registers a new user in the system.
      *
-     * @param user the user entity containing registration details
+     * @param userRequest the user entity containing registration details
      * @return the saved and persisted user entity
      * @throws Exception if validation fails or a user with the same unique constraints already exists
      */
-    User registerUser(User user) throws Exception;
+    RegisterResponse registerUser(RegisterRequest userRequest) throws Exception;
 
     /**
      * Retrieves a user by their unique identifier.

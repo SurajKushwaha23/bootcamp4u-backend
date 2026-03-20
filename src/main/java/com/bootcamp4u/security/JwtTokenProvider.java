@@ -113,8 +113,6 @@ public class JwtTokenProvider {
             logger.error("Unsupported JWT token: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             logger.error("JWT token claims string is empty: {}", e.getMessage());
-        } catch (SignatureException e) {
-            logger.error("JWT signature validation failed: {}", e.getMessage());
         } catch (Exception e) {
             logger.error("Error validating JWT token: {}", e.getMessage());
         }
@@ -131,6 +129,11 @@ public class JwtTokenProvider {
         return getAllClaimsFromToken(token).getExpiration();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<String> getRolesFromToken(String token) {
+        return getClaimFromToken(token, claims -> claims.get("roles", List.class));
+    }
+
     /**
      * Generic helper to extract any claim without re-parsing the token multiple times.
      */
@@ -138,6 +141,7 @@ public class JwtTokenProvider {
         final Claims claims = jwtParser.parseSignedClaims(token).getPayload();
         return claimsResolver.apply(claims);
     }
+
 
 
 }
