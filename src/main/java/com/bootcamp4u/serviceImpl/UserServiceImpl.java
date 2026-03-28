@@ -1,28 +1,31 @@
 package com.bootcamp4u.serviceImpl;
 
 import com.bootcamp4u.dto.request.RegisterRequest;
-import com.bootcamp4u.dto.response.RegisterResponse;
+import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
 import com.bootcamp4u.exception.DuplicateResourceException;
+import com.bootcamp4u.exception.InvalidInputException;
+import com.bootcamp4u.exception.ResourceNotFoundException;
 import com.bootcamp4u.mapper.UserMapper;
 import com.bootcamp4u.repository.UserRepository;
 import com.bootcamp4u.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -35,8 +38,8 @@ public class UserServiceImpl implements UserService {
      * * @param user The user object (validated via @Valid in the controller)
      * @return The saved User entity
      */
-    public RegisterResponse registerUser(RegisterRequest request) {
-        logger.info("Processing registration for username: {}", request.getUsername());
+    public UserResponse registerUser(RegisterRequest request) {
+        log.info("Processing registration for username: {}", request.getUsername());
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username is already taken.");
@@ -51,43 +54,93 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
-        logger.info("User {} registered successfully with ID: {}", savedUser.getUsername(), savedUser.getId());
+        log.info("User {} registered successfully with ID: {}", savedUser.getUsername(), savedUser.getId());
 
         return userMapper.toResponse(savedUser);
     }
 
     @Override
-    public Optional<User> getUserById(Long id) {
-        return Optional.empty();
+    public UserResponse getUserById(UUID id) {
+        log.debug("Fetching user details with id: {}", id);
+
+        // 1. Retrieve the user from the repository, throwing a specific exception if not found
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Failed to find user details with id: {}", id);
+                    return new ResourceNotFoundException("User not found with id: " + id);
+                });
+
+        return userMapper.toResponse(user);
+
     }
 
     @Override
-    public Optional<User> getUserByUsername(String username) {
-        return Optional.empty();
+    @Transactional(readOnly = true)
+    public UserResponse getUserByUsername(String username) {
+        // 1. Guard clause for bad input
+        if (!StringUtils.hasText(username)) {
+            log.warn("Username is null or empty");
+            throw new InvalidInputException("Username is null or empty");
+
+        }
+
+        log.debug("Fetching user details by username: {}", username);
+
+        // 2. Functional approach to Optional handling
+        return userRepository.findByEmail(username)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> {
+            log.warn("Failed to find user details by username: {}", username);
+            return new ResourceNotFoundException("User not found with username: " + username);
+        });
+
     }
 
     @Override
-    public Optional<User> getUserByEmail(String email) {
-        return Optional.empty();
+    @Transactional(readOnly = true)
+    public UserResponse getUserByEmail(String email) {
+
+        // 1. Guard clause for bad input
+        if (!StringUtils.hasText(email)) {
+            log.warn("Email is null or empty");
+            throw new InvalidInputException("Email is null or empty");
+        }
+
+        log.debug("Fetching user details by email: {}", email);
+
+       // 2. Functional approach to Optional handling
+      return userRepository.findByEmail(email)
+              .map(userMapper::toResponse)
+              .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return List.of();
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+
+        log.debug("Fetching all users in page: {}", pageable);
+
+        return  userRepository.findAll(pageable).map(userMapper::toResponse);
     }
 
-    @Override
-    public Page<User> getAllUsers(Pageable pageable) {
-        return null;
-    }
 
     @Override
-    public User updateUser(User user) {
-        return null;
-    }
+    @Transactional
+    public void deleteUser(UUID id) {
 
-    @Override
-    public void deleteUser(Long id) {
+        log.debug("Deleting user with id: {}", id);
+        // 1. Verify the user exists before attempting deletion
+        if (!userRepository.existsById(id)) {
+           log.warn("User with id: {} does not exist", id);
+           throw new ResourceNotFoundException("User not with given id: " + id);
+        }
+
+        // 2. Perform the deletion (which triggers your @SQLDelete soft-delete)
+        userRepository.deleteById(id);
+
+        // 3. Log success only after we know it worked
+        log.info("User with id: {} deleted successfully", id);
 
     }
 
@@ -102,17 +155,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User activateUser(Long id) {
+    public User activateUser(UUID id) {
         return null;
     }
 
     @Override
-    public User deactivateUser(Long id) {
+    public User deactivateUser(UUID id) {
         return null;
     }
 
     @Override
-    public User changePassword(Long id, String newPassword) {
+    public User changePassword(UUID id, String newPassword) {
         return null;
     }
 

@@ -1,11 +1,8 @@
 package com.bootcamp4u.mapper;
 
 import com.bootcamp4u.dto.request.RegisterRequest;
-import com.bootcamp4u.dto.response.RegisterResponse;
+import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -35,12 +32,12 @@ public class UserMapper {
     }
 
     // Maps your User Entity back to a safe Response DTO
-    public RegisterResponse toResponse(User user) {
+    public UserResponse toResponse(User user) {
         if (user == null) {
             return null;
         }
 
-        return RegisterResponse.builder()
+        return UserResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())

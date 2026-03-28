@@ -1,13 +1,14 @@
 package com.bootcamp4u.service;
 
 import com.bootcamp4u.dto.request.RegisterRequest;
-import com.bootcamp4u.dto.response.RegisterResponse;
+import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service interface for managing {@link User} entities.
@@ -22,7 +23,7 @@ public interface UserService {
      * @return the saved and persisted user entity
      * @throws Exception if validation fails or a user with the same unique constraints already exists
      */
-    RegisterResponse registerUser(RegisterRequest userRequest) throws Exception;
+    UserResponse registerUser(RegisterRequest userRequest) throws Exception;
 
     /**
      * Retrieves a user by their unique identifier.
@@ -30,53 +31,17 @@ public interface UserService {
      * @param id the unique ID of the user
      * @return an {@link Optional} containing the user if found, or empty if not found
      */
-    Optional<User> getUserById(Long id);
+    UserResponse getUserById(UUID id);
 
-    /**
-     * Retrieves a user by their unique username.
-     *
-     * @param username the username to search for
-     * @return an {@link Optional} containing the user if found, or empty if not found
-     */
-    Optional<User> getUserByUsername(String username);
+    UserResponse getUserByUsername(String username);
 
-    /**
-     * Retrieves a user by their registered email address.
-     *
-     * @param email the email address to search for
-     * @return an {@link Optional} containing the user if found, or empty if not found
-     */
-    Optional<User> getUserByEmail(String email);
+    UserResponse getUserByEmail(String email);
 
-    /**
-     * Retrieves a list of all users in the system.
-     * Note: For large datasets, consider using the paginated version of this method.
-     *
-     * @return a list of all user entities
-     */
-    List<User> getAllUsers();
+    Page<UserResponse> getAllUsers(Pageable pageable);
 
-    /**
-     * Retrieves a paginated and optionally sorted list of users.
-     * * @param pageable the pagination and sorting information
-     * @return a page of user entities
-     */
-    Page<User> getAllUsers(Pageable pageable);
+    // User updateUser(User user);
 
-    /**
-     * Updates an existing user's details.
-     *
-     * @param user the user entity containing the updated information
-     * @return the updated user entity
-     */
-    User updateUser(User user);
-
-    /**
-     * Deletes a user from the system based on their ID.
-     *
-     * @param id the unique ID of the user to delete
-     */
-    void deleteUser(Long id);
+    void deleteUser(UUID id);
 
     /**
      * Checks if a specific username is already taken.
@@ -100,7 +65,7 @@ public interface UserService {
      * @param id the unique ID of the user to activate
      * @return the updated, activated user entity
      */
-    User activateUser(Long id);
+    User activateUser(UUID id);
 
     /**
      * Deactivates a user account, preventing them from logging in.
@@ -108,7 +73,7 @@ public interface UserService {
      * @param id the unique ID of the user to deactivate
      * @return the updated, deactivated user entity
      */
-    User deactivateUser(Long id);
+    User deactivateUser(UUID id);
 
     /**
      * Changes the password for a specific user.
@@ -117,7 +82,7 @@ public interface UserService {
      * @param newPassword the new raw password (should be encoded by the implementation before saving)
      * @return the updated user entity
      */
-    User changePassword(Long id, String newPassword);
+    User changePassword(UUID id, String newPassword);
 
     /**
      * Initiates a password reset process (e.g., generating a token and sending an email).

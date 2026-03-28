@@ -1,5 +1,6 @@
 package com.bootcamp4u.config;
 
+import com.bootcamp4u.entity.User;
 import com.bootcamp4u.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +27,18 @@ public class ApplicationConfig {
      */
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                // Make sure your UserRepository has an Optional<User> findByUsername(String username) method!
-                .orElseThrow(() -> new UsernameNotFoundException("User not found in the database"));
+        return username -> {
+            // 1. Fetch your custom user entity
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found in the database"));
+
+            // 2. Map it to Spring Security's UserDetails object
+            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword()) // Ensure this is hashed in the DB!
+                    .roles(String.valueOf(user.getRole())) // You can also map dynamic roles from your user entity here
+                    .build();
+        };
     }
 
     /**

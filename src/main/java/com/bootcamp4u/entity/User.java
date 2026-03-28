@@ -7,30 +7,28 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
+// 1. Override the DELETE command
+@SQLDelete(sql = "UPDATE users SET is_active = false WHERE id = ? AND version = ?")
+// 2. Filter all SELECT commands
+@SQLRestriction("is_active = true")
 @Getter                 // Generates all getters
 @Setter                 // Generates all setters
 @NoArgsConstructor      // Generates default constructor
 @AllArgsConstructor     // Generates constructor with all fields
+@EqualsAndHashCode(callSuper = true)
+public class User extends BaseEntity implements UserDetails {
 
-
-public class User implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
@@ -58,17 +56,6 @@ public class User implements UserDetails {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
-    @Version
-    private Long version;
 
 
     @Override

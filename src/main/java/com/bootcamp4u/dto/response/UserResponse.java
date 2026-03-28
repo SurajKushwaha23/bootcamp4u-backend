@@ -7,13 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterResponse {
-    private Long id;
+public class UserResponse {
+    private UUID id;
     private String username;
     private String email;
     private String phone;
