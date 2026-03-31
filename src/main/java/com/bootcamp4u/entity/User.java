@@ -29,6 +29,12 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity implements UserDetails {
 
+    @NotBlank(message ="Firstname is required")
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = true)
+    private String lastName;
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")

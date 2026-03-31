@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore sensitive secret keys
+src/main/resources/application-secrets.properties

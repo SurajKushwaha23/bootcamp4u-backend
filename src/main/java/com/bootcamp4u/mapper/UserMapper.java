@@ -21,6 +21,8 @@ public class UserMapper {
         }
 
         User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
@@ -39,6 +41,8 @@ public class UserMapper {
 
         return UserResponse.builder()
                 .id(user.getId())
+                .firstname(user.getFirstName())
+                .lastname(user.getLastName())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .phone(user.getPhone())
