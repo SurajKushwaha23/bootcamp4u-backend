@@ -38,7 +38,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    @Column(name="username", unique = true, nullable = false)
+    @Column(name="username", unique = true, nullable = false, updatable = false)
     private String username;
 
     @NotBlank(message = "Password is required")
@@ -48,7 +48,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Please provide a valid email address")
-    @Column(name="email", nullable = false, unique = true)
+    @Column(name="email", nullable = false, unique = true, updatable = false)
     private String email;
 
     @NotBlank(message = "Phone number is required")

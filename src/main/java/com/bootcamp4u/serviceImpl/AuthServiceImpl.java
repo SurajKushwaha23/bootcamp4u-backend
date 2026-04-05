@@ -6,8 +6,7 @@ import com.bootcamp4u.repository.UserRepository;
 import com.bootcamp4u.security.JwtTokenProvider;
 import com.bootcamp4u.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,15 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-
-    private final static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
@@ -34,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        logger.info("Login attempt for username: {}", request.getUsername());
+        log.debug("Login attempt for username: {}", request.getUsername());
 
         try {
             // 1. Authenticate the user credentials
@@ -42,27 +38,38 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
+            log.debug("Authentication result: {}", authentication.isAuthenticated());
+
+
+
             // 2. Extract username and roles from the authenticated object
             String username = authentication.getName();
+
+            log.debug("Username : {}", authentication.getName());
+
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
+            log.debug("Roles : {}", roles);
+
             // 3. Generate the JWT token passing the extracted data
             String token = jwtTokenProvider.generateToken(username, roles);
 
-            logger.info("Login successful for username: {}", username);
+            log.debug("Token : {}", token);
+
+            log.info("Login successful for username: {}", username);
 
             return new LoginResponse(username, token);
 
 
         } catch (
                 BadCredentialsException e) {
-            logger.warn("Invalid credentials for username: {}", request.getUsername());
+            log.warn("Invalid credentials for username: {}", request.getUsername());
             throw new RuntimeException("Invalid username or password");
         } catch (
                 AuthenticationException e) {
-            logger.error("Authentication failed for username: {}", request.getUsername(), e);
+            log.error("Authentication failed for username: {}", request.getUsername(), e);
             throw new RuntimeException("Authentication failed");
         }
 

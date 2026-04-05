@@ -2,6 +2,8 @@ package com.bootcamp4u.repository;
 
 import com.bootcamp4u.common.BootcampStatus;
 import com.bootcamp4u.entity.Bootcamp;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +29,7 @@ public interface BootcampRepository extends JpaRepository<Bootcamp, UUID> {
     // Example of a custom JPQL query for complex filtering
     @Query("SELECT b FROM Bootcamp b WHERE b.status = 'PUBLISHED' AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Bootcamp> searchPublishedBootcamps(@Param("keyword") String keyword, Pageable pageable);
+
+    boolean existsBySlug(String slug);
+
 }

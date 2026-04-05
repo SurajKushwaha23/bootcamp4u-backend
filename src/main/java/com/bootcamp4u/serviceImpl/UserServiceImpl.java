@@ -1,6 +1,7 @@
 package com.bootcamp4u.serviceImpl;
 
 import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.response.PageResponse;
 import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
 import com.bootcamp4u.exception.DuplicateResourceException;
@@ -12,6 +13,7 @@ import com.bootcamp4u.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -117,11 +119,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(Pageable pageable) {
+    public PageResponse<UserResponse> getAllUsers(int page, int size) {
 
-        log.debug("Fetching all users in page: {}", pageable);
+        Pageable pageable = PageRequest.of(page, size);
 
-        return  userRepository.findAll(pageable).map(userMapper::toResponse);
+        // 1. Fetch and map the data exactly as you were doing before
+        Page<UserResponse> userPage = userRepository.findAll(pageable)
+                .map(userMapper::toResponse);
+
+        // 2. Wrap the mapped page and its content into your custom DTO
+        return new PageResponse<>(userPage, userPage.getContent());
     }
 
 

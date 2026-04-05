@@ -1,6 +1,7 @@
 package com.bootcamp4u.controller;
 
 import com.bootcamp4u.dto.response.ApiResponse;
+import com.bootcamp4u.dto.response.PageResponse;
 import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("get-all-users")
-    public ResponseEntity<Page<UserResponse>> getAllUsers(
-            @PageableDefault(page = 0, size = 20, sort = "email") Pageable pageable) {
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size ) {
 
-        Page<UserResponse> usersPage = userService.getAllUsers(pageable);
+        PageResponse<UserResponse> usersPage = userService.getAllUsers(page, size);
         return ResponseEntity.ok(usersPage);
     }
 

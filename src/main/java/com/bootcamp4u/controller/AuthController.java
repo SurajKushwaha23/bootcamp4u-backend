@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("${app.security.authPath}")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
@@ -47,12 +47,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
 
+        log.debug("Login request: {}", request);
+
         // Pass the request body down to the service layer we built earlier
         LoginResponse loginResponse = authService.login(request);
+        log.debug("Login response: {}", loginResponse);
 
         String message = String.format("%s authenticated successfully", loginResponse.getUsername());
 
-        log.info("User authenticated successfully: {}", loginResponse.getUsername());
+        log.debug("User authenticated successfully: {}", loginResponse.getUsername());
 
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), message,  loginResponse));
     }

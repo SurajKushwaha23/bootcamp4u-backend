@@ -1,6 +1,7 @@
 package com.bootcamp4u.service;
 
 import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.response.PageResponse;
 import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public interface UserService {
 
     UserResponse getUserByEmail(String email);
 
-    Page<UserResponse> getAllUsers(Pageable pageable);
+    PageResponse<UserResponse> getAllUsers(int page, int size);
 
     // User updateUser(User user);
 

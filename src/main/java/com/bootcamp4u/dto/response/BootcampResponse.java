@@ -1,33 +1,33 @@
 package com.bootcamp4u.dto.response;
 
 import com.bootcamp4u.common.BootcampStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class BootcampResponse {
 
-    private UUID id;         // The auto-generated UUID
+    private UUID id;
     private String title;
-    private String slug;      // Backend-generated slug
+    private String slug;
     private String description;
     private BigDecimal price;
     private BootcampStatus status;
 
+    // Flattened Instructor details
     private UUID instructorId;
+    // Assuming your User entity has a getFullName() or getUsername() method
     private String instructorName;
 
-    private List<ModuleResponse> modules;
-
-    // Auditing fields from BaseEntity
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Long version;     // Useful for the frontend to track state
+    // Note: If you want to include course modules, you should create a
+    // CourseModuleResponse DTO and include it as a list here:
+    // private List<CourseModuleResponse> courseModules;
 }
