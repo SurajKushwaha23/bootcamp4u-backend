@@ -3,16 +3,11 @@ package com.bootcamp4u.mapper;
 import com.bootcamp4u.dto.request.RegisterRequest;
 import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@RequiredArgsConstructor
 public class UserMapper {
-
-    private final PasswordEncoder passwordEncoder;
 
     // Maps the incoming Request DTO to your User Entity
     public User toEntity(RegisterRequest request) {
@@ -24,7 +19,7 @@ public class UserMapper {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(request.getPassword());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setRole(request.getRole());

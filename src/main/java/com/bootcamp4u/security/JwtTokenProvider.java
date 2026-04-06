@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
@@ -77,7 +76,7 @@ public class JwtTokenProvider {
             Date now = new Date();
             Date expiryDate = new Date(now.getTime() + expiration);
 
-            byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
             SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 
             return Jwts.builder()
@@ -97,7 +96,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+            SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 
             Jwts.parser()
                     .verifyWith(key) // Modern verification

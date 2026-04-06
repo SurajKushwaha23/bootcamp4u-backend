@@ -2,7 +2,6 @@ package com.bootcamp4u.serviceImpl;
 
 import com.bootcamp4u.dto.request.LoginRequest;
 import com.bootcamp4u.dto.response.LoginResponse;
-import com.bootcamp4u.repository.UserRepository;
 import com.bootcamp4u.security.JwtTokenProvider;
 import com.bootcamp4u.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -37,41 +35,28 @@ public class AuthServiceImpl implements AuthService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
-
-            log.debug("Authentication result: {}", authentication.isAuthenticated());
-
-
+            log.debug("User authenticated successfully: {}", authentication.getName());
 
             // 2. Extract username and roles from the authenticated object
             String username = authentication.getName();
-
-            log.debug("Username : {}", authentication.getName());
-
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
-
-            log.debug("Roles : {}", roles);
+            log.debug("User roles: {}", roles);
 
             // 3. Generate the JWT token passing the extracted data
             String token = jwtTokenProvider.generateToken(username, roles);
-
-            log.debug("Token : {}", token);
+            log.debug("JWT token generated successfully for user: {}", username);
 
             log.info("Login successful for username: {}", username);
-
             return new LoginResponse(username, token);
 
-
-        } catch (
-                BadCredentialsException e) {
+        } catch (BadCredentialsException e) {
             log.warn("Invalid credentials for username: {}", request.getUsername());
-            throw new RuntimeException("Invalid username or password");
-        } catch (
-                AuthenticationException e) {
+            throw new RuntimeException("Invalid username or password", e);
+        } catch (AuthenticationException e) {
             log.error("Authentication failed for username: {}", request.getUsername(), e);
-            throw new RuntimeException("Authentication failed");
+            throw new RuntimeException("Authentication failed", e);
         }
-
     }
 }
