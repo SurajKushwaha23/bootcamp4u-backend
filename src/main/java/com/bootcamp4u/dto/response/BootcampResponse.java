@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -26,6 +27,8 @@ public class BootcampResponse {
     private UUID instructorId;
     // Assuming your User entity has a getFullName() or getUsername() method
     private String instructorName;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // Note: If you want to include course modules, you should create a
     // CourseModuleResponse DTO and include it as a list here:

@@ -3,21 +3,17 @@ package com.bootcamp4u.service;
 import com.bootcamp4u.common.BootcampStatus;
 import com.bootcamp4u.dto.request.BootcampCreateRequest;
 import com.bootcamp4u.dto.response.BootcampResponse;
-import com.bootcamp4u.entity.Bootcamp;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.bootcamp4u.dto.response.PageResponse;
 
-import java.util.UUID;
 
 public interface BootcampService {
 
     BootcampResponse createBootcamp(BootcampCreateRequest request, String authenticatedUserIdentifier);
+    PageResponse<BootcampResponse> getAllBootcamps(int page, int size);
 
    /* Bootcamp getBootcampById(UUID id);
 
     Bootcamp getBootcampBySlug(String slug);
-
-    Page<Bootcamp> getAllBootcamps(Pageable pageable);
 
     Page<Bootcamp> getBootcampsByInstructor(UUID instructorId, Pageable pageable);
 

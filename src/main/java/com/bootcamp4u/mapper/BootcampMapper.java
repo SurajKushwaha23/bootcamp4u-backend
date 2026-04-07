@@ -40,6 +40,8 @@ public class BootcampMapper {
                 .description(entity.getDescription())
                 .price(entity.getPrice())
                 .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .instructorId(entity.getInstructor().getId())
                 // Replace .getUsername() with whatever name field your User entity uses
                 .instructorName(entity.getInstructor().getUsername())

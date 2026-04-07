@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableJpaAuditing
 public class ApplicationConfig {
 
     // Pulls from application.yml: app.cors.allowed-origins=http://localhost:3000,http://localhost:5173

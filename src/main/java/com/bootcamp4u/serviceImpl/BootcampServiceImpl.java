@@ -3,6 +3,7 @@ package com.bootcamp4u.serviceImpl;
 import com.bootcamp4u.common.Role;
 import com.bootcamp4u.dto.request.BootcampCreateRequest;
 import com.bootcamp4u.dto.response.BootcampResponse;
+import com.bootcamp4u.dto.response.PageResponse;
 import com.bootcamp4u.entity.Bootcamp;
 import com.bootcamp4u.entity.User;
 import com.bootcamp4u.exception.AuthorizationException;
@@ -16,6 +17,9 @@ import com.bootcamp4u.util.SlugUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +43,7 @@ public class BootcampServiceImpl implements BootcampService {
         // Optional: Early fail for better UX, but not reliable for concurrency
         if (bootcampRepository.existsBySlug(generatedSlug)) {
             log.warn("Bootcamp creation failed. Slug already exists: {}", generatedSlug);
-            throw new DuplicateResourceException("A bootcamp with this slug already exists: " + generatedSlug);
+            throw new DuplicateResourceException("A bootcamp with " + generatedSlug + " slug already exists: ");
         }
 
         // 2. Fetch Required Dependencies and Validate Role
@@ -50,8 +54,8 @@ public class BootcampServiceImpl implements BootcampService {
                 });
 
         // Ensure the user actually has the authority to be an instructor
-        if (!instructor.getRole().equals(Role.INSTRUCTOR)) {
-            log.warn("User {} attempted to create a bootcamp without instructor privileges.", instructor.getId());
+        if (!instructor.getRole().equals(Role.INSTRUCTOR) && !instructor.getRole().equals(Role.ADMIN)) {
+            log.warn("User {} attempted to create a bootcamp without instructor privileges.", instructor.getFirstName());
             throw new AuthorizationException("The provided user is not an instructor.");
         }
 
@@ -68,5 +72,19 @@ public class BootcampServiceImpl implements BootcampService {
             log.error("Database constraint violation for slug: {}", generatedSlug, e);
             throw new DuplicateResourceException("A bootcamp with this slug already exists: " + generatedSlug);
         }
+    }
+
+    @Override
+    public PageResponse<BootcampResponse> getAllBootcamps(int page, int size) {
+        // 1. Fix the zero-index issue (if frontend sends page 1, we query page 0)
+         var pageNumber = page > 0 ? (page - 1) : 0;
+         Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // 2. Fetch and map the data exactly as you were doing before
+         var bootcampPage = bootcampRepository.findAll(pageable).map(bootcampMapper::toResponse);
+
+        // 3. Wrap the mapped page and its content into your custom DTO
+        return new PageResponse<>(bootcampPage, bootcampPage.getContent());
+
     }
 }
