@@ -1,6 +1,6 @@
 package com.bootcamp4u.mapper;
 
-import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.request.UserRegistrationRequest;
 import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
 
     // Maps the incoming Request DTO to your User Entity
-    public User toEntity(RegisterRequest request) {
+    public User toEntity(UserRegistrationRequest request) {
         if (request == null) {
             return null;
         }

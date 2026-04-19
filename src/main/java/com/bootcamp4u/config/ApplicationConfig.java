@@ -82,8 +82,13 @@ public class ApplicationConfig {
      * Spring handles the complex creation of this; we just expose it as a bean.
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+        try{
+            return config.getAuthenticationManager();
+        }catch (Exception e){
+            throw new RuntimeException("AuthenticationConfiguration is failed", e);
+        }
+
     }
 
     @Bean

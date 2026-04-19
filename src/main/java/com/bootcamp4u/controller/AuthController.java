@@ -1,7 +1,7 @@
 package com.bootcamp4u.controller;
 
 import com.bootcamp4u.dto.request.LoginRequest;
-import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.request.UserRegistrationRequest;
 import com.bootcamp4u.dto.response.ApiResponse;
 import com.bootcamp4u.dto.response.LoginResponse;
 import com.bootcamp4u.dto.response.UserResponse;
@@ -28,7 +28,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request) throws Exception {
+    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody UserRegistrationRequest request) throws Exception {
 
          UserResponse response = userService.registerUser(request);
 

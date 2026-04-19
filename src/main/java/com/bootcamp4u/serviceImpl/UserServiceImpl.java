@@ -1,6 +1,6 @@
 package com.bootcamp4u.serviceImpl;
 
-import com.bootcamp4u.dto.request.RegisterRequest;
+import com.bootcamp4u.dto.request.UserRegistrationRequest;
 import com.bootcamp4u.dto.response.PageResponse;
 import com.bootcamp4u.dto.response.UserResponse;
 import com.bootcamp4u.entity.User;
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
      * * @param user The user object (validated via @Valid in the controller)
      * @return The saved User entity
      */
-    public UserResponse registerUser(RegisterRequest request) {
+    public UserResponse registerUser(UserRegistrationRequest request) {
         log.info("Processing registration for username: {}", request.getUsername());
 
         if (userRepository.existsByUsername(request.getUsername())) {

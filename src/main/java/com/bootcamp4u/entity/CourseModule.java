@@ -12,7 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"bootcamp", "lessons"})
+@ToString(exclude = {"bootcamp", "lessons"})
 public class CourseModule extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,6 +22,9 @@ public class CourseModule extends BaseEntity {
 
     @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @Column(name = "sequence_order", nullable = false)
     private Integer sequenceOrder;

@@ -9,16 +9,18 @@ import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "bootcamps")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false)
-@SQLDelete(sql = "UPDATE bootcamps SET is_deleted = true WHERE id=?")
-@SQLRestriction("is_deleted=false")
+@ToString(exclude = {"instructor", "courseModules"})
+//@SQLDelete(sql = "UPDATE bootcamps SET is_deleted = true WHERE id=? AND version=?")
+//@SQLRestriction("is_deleted=false")
 public class Bootcamp extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,10 +30,13 @@ public class Bootcamp extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
+    // The 'slug' is a perfect Business Key (natural identifier)
+    // because it is both required and guaranteed unique.
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob // Marks it as a Large Object
+    @Column(columnDefinition = "LONGTEXT") // Explicitly tells MySQL to use LONGTEXT
     private String description;
 
     @Column(nullable = false)
@@ -48,4 +53,39 @@ public class Bootcamp extends BaseEntity {
     @OneToMany(mappedBy = "bootcamp", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<CourseModule> courseModules = new ArrayList<>();
+
+    // ==========================================
+    //       UTILITY METHODS (SYNCHRONIZATION)
+    // ==========================================
+
+    public void addCourseModule(CourseModule module) {
+        courseModules.add(module);
+        module.setBootcamp(this); // Syncs the database foreign key
+    }
+
+    public void removeCourseModule(CourseModule module) {
+        courseModules.remove(module);
+        module.setBootcamp(null); // Removes the foreign key link
+    }
+
+    // ==========================================
+    //    BUSINESS KEY EQUALS & HASHCODE
+    // ==========================================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        // Using 'instanceof' is safer in JPA because Hibernate
+        // creates proxy classes that might fail a strict getClass() check.
+        if (!(o instanceof Bootcamp bootcamp)) return false;
+
+        // Two bootcamps are considered equal if they share the same unique slug
+        return slug != null && slug.equals(bootcamp.getSlug());
+    }
+
+    @Override
+    public int hashCode() {
+        // Hash based exclusively on the immutable business key
+        return Objects.hash(slug);
+    }
 }

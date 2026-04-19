@@ -8,7 +8,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ModuleResponse {
+public class CourseModuleResponse {
 
     private UUID id;
     private String title;

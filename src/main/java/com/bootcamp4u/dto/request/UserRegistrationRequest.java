@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
+public class UserRegistrationRequest {
 
     @NotBlank(message ="Firstname is required")
     @Column(name = "first_name", nullable = false)

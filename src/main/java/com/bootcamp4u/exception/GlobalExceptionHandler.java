@@ -68,4 +68,15 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(OptimisticLockingException.class)
+    public ResponseEntity<ErrorResponse> optimisticLockingException(OptimisticLockingException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value()
+                ,ex.getMessage(),
+                LocalDateTime.now(),
+                Collections.emptyMap()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
 }
