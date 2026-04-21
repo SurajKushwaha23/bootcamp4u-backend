@@ -28,7 +28,7 @@ import java.util.List;
 public class ApplicationConfig {
 
     // Pulls from application.yml: app.cors.allowed-origins=http://localhost:3000,http://localhost:5173
-    @Value("${app.cors.allowed-origins}")
+    @Value("http://localhost:5173/")
     private List<String> allowedOrigins;
 
     private final UserRepository userRepository;

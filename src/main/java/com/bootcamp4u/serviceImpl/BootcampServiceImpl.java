@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -85,9 +84,9 @@ public class BootcampServiceImpl implements BootcampService {
             log.info("Successfully created bootcamp with ID: {}", savedBootcamp.getId());
 
             // Log saved modules
-            if (savedBootcamp.getCourseModules() != null && !savedBootcamp.getCourseModules().isEmpty()) {
-                log.info("Bootcamp saved with {} course modules", savedBootcamp.getCourseModules().size());
-                savedBootcamp.getCourseModules().forEach(module ->
+            if (savedBootcamp.getSections() != null && !savedBootcamp.getSections().isEmpty()) {
+                log.info("Bootcamp saved with {} course modules", savedBootcamp.getSections().size());
+                savedBootcamp.getSections().forEach(module ->
                     log.debug("Saved Module ID: {}, title='{}', order={}",
                         module.getId(), module.getTitle(), module.getSequenceOrder())
                 );

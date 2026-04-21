@@ -50,6 +50,7 @@ public class BootcampMapper {
                 .updatedAt(entity.getUpdatedAt())
                 .instructorId(entity.getInstructor().getId())
                 .instructorName(entity.getInstructor().getUsername())
+                .version(entity.getVersion())
                 .build();
     }
 

@@ -3,8 +3,6 @@ package com.bootcamp4u.entity;
 import com.bootcamp4u.common.BootcampStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"instructor", "courseModules"})
+@ToString(exclude = {"instructor", "sections"})
 //@SQLDelete(sql = "UPDATE bootcamps SET is_deleted = true WHERE id=? AND version=?")
 //@SQLRestriction("is_deleted=false")
 public class Bootcamp extends BaseEntity {
@@ -52,19 +50,19 @@ public class Bootcamp extends BaseEntity {
 
     @OneToMany(mappedBy = "bootcamp", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<CourseModule> courseModules = new ArrayList<>();
+    private List<Section> sections = new ArrayList<>();
 
     // ==========================================
     //       UTILITY METHODS (SYNCHRONIZATION)
     // ==========================================
 
-    public void addCourseModule(CourseModule module) {
-        courseModules.add(module);
+    public void addCourseModule(Section module) {
+        sections.add(module);
         module.setBootcamp(this); // Syncs the database foreign key
     }
 
-    public void removeCourseModule(CourseModule module) {
-        courseModules.remove(module);
+    public void removeCourseModule(Section module) {
+        sections.remove(module);
         module.setBootcamp(null); // Removes the foreign key link
     }
 

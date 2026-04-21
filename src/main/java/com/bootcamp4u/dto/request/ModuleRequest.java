@@ -10,10 +10,10 @@ import lombok.*;
 @Builder
 public class ModuleRequest {
 
-    @NotBlank(message = "CourseModule title is required")
+    @NotBlank(message = "Section title is required")
     private String title;
 
-    @NotBlank(message = "CourseModule content is required")
+    @NotBlank(message = "Section content is required")
     private String content;
 
     @NotNull(message = "Order index is required to maintain sequence")

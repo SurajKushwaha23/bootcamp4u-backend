@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, UUID> {
-    // Fetches lessons for a specific courseModule, ordered correctly
-    List<Lesson> findAllByCourseModule_IdOrderBySequenceOrderAsc(UUID moduleId);
+    // Fetches lessons for a specific section, ordered correctly
+    List<Lesson> findAllBySection_IdOrderBySequenceOrderAsc(UUID moduleId);
 }

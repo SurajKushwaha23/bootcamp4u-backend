@@ -14,8 +14,8 @@ import lombok.*;
 public class Lesson extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "courseModule_id", nullable = false)
-    private CourseModule courseModule;
+    @JoinColumn(name = "section_id", nullable = false)
+    private Section section;
 
     @Column(nullable = false)
     private String title;
